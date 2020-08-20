@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <title>Fargespill v2</title>
+    </head>
+    <style>
+        .boks {
+            width: 100px;
+            height: 100px;
+            float: left;
+        }
+
+        .bokser  {
+            position: relative;
+        }
+
+        #gjett-div {
+            width: 200px;
+            height: 200px;
+            display: inline-block;
+        }
+
+        img {
+            display: inline-block;
+            width: 300px;
+            height: 200px;
+        }
+    </style>
+    <body>
+        <h1>Fargespill v.2</h1>
+        <button id="btn-lett">Lett</button>
+        <button id="btn-middels">Middels</button>
+        <button id="btn-vanskelig">Vanskelig</button>
+        <h3>Klikk på boksen nedenfor som matcher denne boksens farge</h3>
+        <div id="gjett-div"></div>
+        <img id="riktig-img" src="img/riktig.jpg" alt="klopp" />
+        <img id="feil-img" src="img/feil.png" alt="ikke så hyggelig bilde" />
+        <h3 id="utskrift">Du har ikke svart enda.</h3>
+        <h3 id="utskrift2"></h3>
+        <h3 id="info-h3">Klikk på riktig boks nedenfor</h3>
+        <button id="btn-neste">Neste oppgave</button>
+        <div style="width: 510px; height: 410px;">
+            <div class="bokser" id="lett">
+                <div class="boks" id="boks1"></div>
+                <div class="boks" id="boks2"></div>
+                <div class="boks" id="boks3"></div>
+            </div>
+            <div class="bokser" id="middels">
+                <div class="boks" id="boks4"></div>
+                <div class="boks" id="boks5"></div>
+                <div class="boks" id="boks6"></div>
+                <div class="boks" id="boks7"></div>
+                <div class="boks" id="boks8"></div>
+                <div class="boks" id="boks9"></div>
+                <div class="boks" id="boks10"></div>
+            </div>
+
+            <div class="bokser" id="vanskelig">
+                <div class="boks" id="boks11"></div>
+                <div class="boks" id="boks12"></div>
+                <div class="boks" id="boks13"></div>
+                <div class="boks" id="boks14"></div>
+                <div class="boks" id="boks15"></div>
+                <div class="boks" id="boks16"></div>
+                <div class="boks" id="boks17"></div>
+                <div class="boks" id="boks18"></div>
+                <div class="boks" id="boks19"></div>
+                <div class="boks" id="boks20"></div>
+            </div>
+        </div>
+        <h3 id="score"></h3>
+    </body>
+    <script>
+        // Får tak i HTML-Objekter
+        var gjettDiv = document.getElementById("gjett-div");
+        var utskrift = document.getElementById("utskrift");
+        var utskrift2 = document.getElementById("utskrift2");
+        var scoreUtskrift = document.getElementById("score");
+        var btnLett = document.getElementById("btn-lett");
+        var btnMiddels = document.getElementById("btn-middels");
+        var btnVanskelig = document.getElementById("btn-vanskelig");
+        var middelsDiv = document.getElementById("middels");
+        var vanskeligDiv = document.getElementById("vanskelig");
+        var infoHeader = document.getElementById("info-h3");
+        var btnNeste = document.getElementById("btn-neste");
+        var riktigBilde = document.getElementById("riktig-img");
+        var feilBilde = document.getElementById("feil-img");
+
+        var riktig = 0;
+        var runder = 0;
+        var feil = 0;
+        var antallBokser = 0;
+
+        // Klikk-funksjoner for knapper
+        btnLett.onclick = settLettOppgave;
+        btnMiddels.onclick = settMiddelsOppgave;
+        btnVanskelig.onclick = settVanskeligOppgave;
+        btnNeste.onclick = tilfeldigFarge;
+
+        // Setter vanskelighetsgrad: Lett
+        function settLettOppgave() {
+            antallBokser = 3;
+            btnLett.disabled = true;
+            btnMiddels.disabled = false;
+            btnVanskelig.disabled = false;
+            middelsDiv.style.visibility = "hidden";
+            vanskeligDiv.style.visibility = "hidden";
+            tilfeldigFarge();
+        }
+
+        // Setter vanskelighetsgrad: Middels
+        function settMiddelsOppgave() {
+            antallBokser = 10;
+            btnLett.disabled = false;
+            btnMiddels.disabled = true;
+            btnVanskelig.disabled = false;
+            middelsDiv.style.visibility = "visible";
+            vanskeligDiv.style.visibility = "hidden";
+            tilfeldigFarge();
+        }
+
+        // Setter vanskelighetsgrad: Vanskelig
+        function settVanskeligOppgave() {
+            antallBokser = 20;
+            btnLett.disabled = false;
+            btnMiddels.disabled = false;
+            btnVanskelig.disabled = true;
+            middelsDiv.style.visibility = "visible";
+            vanskeligDiv.style.visibility = "visible";
+            tilfeldigFarge();
+        }
+
+        // Funksjon som returnerer tilfeldig farge
+        function genererFarge() {
+            var r = Math.floor(Math.random() * 256);
+            var g = Math.floor(Math.random() * 256);
+            var b = Math.floor(Math.random() * 256);
+            var rgb = `rgb(${r},${g},${b})`;
+            return rgb;
+        }
+
+        // Tildeler tilfeldige farger til alle bokser (ny oppgave)
+        function tilfeldigFarge() {
+            for (var i = 1; i <= antallBokser; i++) {
+                document.getElementById(`boks${i}`).style.backgroundColor = genererFarge();
+            }
+
+            var tilfeldigBoks = Math.floor(Math.random() * antallBokser + 1);
+
+            gjettDiv.style.backgroundColor = document.getElementById(`boks${tilfeldigBoks}`).style.backgroundColor;
+            tilbakestillBokser();
+            btnNeste.style.visibility = "hidden";
+            infoHeader.style.visibility = "visible";
+            riktigBilde.style.display = "none";
+            feilBilde.style.display = "none";
+        }
+
+        // Tilbakestiller stil på bokser (border og størrelse)
+        function tilbakestillBokser() {
+            var boks;
+            for (var i = 1; i <= 20; i++) {
+                boks = document.getElementById(`boks${i}`);
+                boks.style.border = "0px";
+                boks.style.width = "100px";
+                boks.style.height = "100px";
+            }
+        }
+
+        // Sjekker om klikket boks har samme farge som den store boksen
+        function sjekkSvar() {
+            var backgroundColor = this.style.backgroundColor;
+            console.log(backgroundColor);
+            tilbakestillBokser();
+            this.style.border = "2px solid black";
+            this.style.width = "196px";
+            this.style.height = "196px";
+
+            if (backgroundColor == gjettDiv.style.backgroundColor) {
+                utskrift.innerHTML = "Riktig!";
+                riktig++;
+                runder++;
+                btnNeste.style.visibility = "visible";
+                infoHeader.style.visibility = "hidden";
+                riktigBilde.style.display = "inline-block";
+                feilBilde.style.display = "none";
+            } else {
+                utskrift.innerHTML = "Feil!!";
+                runder++;
+                feil++;
+                riktigBilde.style.display = "none";
+                feilBilde.style.display = "inline-block";
+            }
+            utskrift.innerHTML = `Du har svart ${riktig}/${runder} riktig`;
+            utskrift2.innerHTML = `Antall feil: ${feil}`;
+        }
+
+        // Oppstartsfunksjon
+        var init = (function() {
+            settLettOppgave();
+            for (var i = 1; i <= 20; i++) {
+                document.getElementById(`boks${i}`).onclick = sjekkSvar;
+            }
+            btnNeste.style.visibility = "visible";
+            infoHeader.style.visibility = "hidden";
+        })();
+        /*
+        Kommentarer:
+        Hvordan kan du generere fargene ved hjelp av javascript? 
+        (endte opp med å generere fargene i javascript i både v1 og v2)
+       
+        Hvordan kan du forenkle måten du generer fargene på?
+       
+        Smart måte å generere fargene på ved hjelp av for-loop. 
+        
+        Dette gjør siden mer dynamisk og enklere å utvide senere (mtp vanskelighetsgrad)
+        
+        Smart delt opp i funksjoner
+        
+        Bra navngivning, lett å forstå koden
+        
+        Kan du finne en enklere måte å utvide med flere div'er? 
+        (Kanskje en løkke som genererer antall div bokser som bruker har angitt?) 
+        
+        Hvordan skal du få fikset problemet med at boksene flytter seg pga border-stilen? Tenk på det.
+        
+        Bra og smarte løsninger, enkelt å utvide. Eneste er at du kunne sett
+        på hvordan du kunne generert divbokser istedet for å lage hver enkelt boks,
+        ellers kjempebra og dynamisk løsning.
+        */
+    </script>
+</html>
